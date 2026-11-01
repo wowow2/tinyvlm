@@ -1,0 +1,13 @@
+__pycache__/
+*.pyc
+.venv/
+.env
+data/
+checkpoints/
+mlruns/
+*.pt
+*.onnx
+*.gguf
+.ipynb_checkpoints/
+.opencode.
+idea/
