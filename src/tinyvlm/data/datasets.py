@@ -9,10 +9,11 @@ def train_val_split(dataset: torch.Tensor, val_frac: float):
     return train_set, val_set
 
 class TokenDataset:
-    def __init__(self, tokens: torch.Tensor, block_size: int, ):
+    def __init__(self, tokens: torch.Tensor, block_size: int, device: str = None):
+        if device is None:
+            device = "cuda" if torch.cuda.is_available() else "cpu"
         self.tokens = tokens.to(device)
         self.block_size = block_size
-
     def __len__(self):
         return len(self.tokens)
 
