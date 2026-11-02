@@ -1,0 +1,17 @@
+{
+  "id": "abbasrizvi05/tinyvlm-train",
+  "title": "tinyvlm train",
+  "code_file": "kaggle/train_kaggle.ipynb",
+  "language": "python",
+  "kernel_type": "notebook",
+  "is_private": true,
+  "enable_gpu": true,
+  "enable_tpu": false,
+  "enable_internet": true,
+  "keywords": [],
+  "dataset_sources": [],
+  "kernel_sources": [],
+  "competition_sources": [],
+  "model_sources": [],
+  "machine_shape": "NvidiaTeslaT4"
+}

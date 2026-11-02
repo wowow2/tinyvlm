@@ -19,12 +19,13 @@ class TrainConfig:
 
 
 class Trainer:
-    def __init__(self, model, train_ds, val_ds, cfg: TrainConfig, model_cfg):
+    def __init__(self, model, train_ds, val_ds, cfg: TrainConfig, model_cfg, tokenizer=None):
         self.model = model.to(cfg.device)
         self.train_ds = train_ds
         self.val_ds = val_ds
         self.cfg = cfg
         self.model_cfg = model_cfg
+        self.tokenizer = tokenizer
         self.optimizer = torch.optim.AdamW(self.model.parameters(), lr=cfg.lr)
         self.step = 0
         self.best_val_loss = float("inf")
@@ -38,6 +39,8 @@ class Trainer:
             self.step,
             self.model_cfg,
             self.cfg,
+            tokenizer=self.tokenizer,
+            best_val_loss=self.best_val_loss,
         )
 
     @torch.no_grad()
@@ -57,14 +60,19 @@ class Trainer:
     def train(self):
         torch.manual_seed(self.cfg.seed)
         if self.cfg.resume and os.path.exists(self.cfg.ckpt_path):
-            self.step, _ = load_checkpoint(
+            self.step, state = load_checkpoint(
                 self.cfg.ckpt_path, self.model, self.optimizer, self.cfg.device
             )
+            self.best_val_loss = state.get("best_val_loss", float("inf"))
             print(f"resumed from step {self.step}")
         self.model.train()
         while self.step < self.cfg.max_steps:
             if self.step % self.cfg.eval_interval == 0:
-                print(self.step, self.estimate_loss())
+                metrics = self.estimate_loss()
+                print(self.step, metrics)
+                if self.step > 0 and metrics["val"] < self.best_val_loss:
+                    self.best_val_loss = metrics["val"]
+                    self.save(self.cfg.best_ckpt_path)
             x, y = self.train_ds.get_batch(self.cfg.batch_size, self.cfg.device)
             _, loss = self.model(x, y)
             self.optimizer.zero_grad(set_to_none=True)

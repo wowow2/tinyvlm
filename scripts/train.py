@@ -22,7 +22,7 @@ def main():
     model = GPT(model_cfg)
     print(f"{sum(p.numel() for p in model.parameters()) / 1e6:.2f}M parameters")
 
-    trainer = Trainer(model, train_ds, val_ds, train_cfg, model_cfg)
+    trainer = Trainer(model, train_ds, val_ds, train_cfg, model_cfg, tokenizer=tok)
     trainer.train()
 
     model.eval()

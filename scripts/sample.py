@@ -6,14 +6,17 @@ from tinyvlm.model.gpt import GPT, GPTConfig
 def main():
     device = "cuda" if torch.cuda.is_available() else "cpu"
 
-    # Rebuild tokenizer from vocabulary
-    with open("data/input.txt") as f:
-        text = f.read()
-    tok = CharTokenizer(text)
-
     # Load checkpoint and config
     ckpt = torch.load("checkpoints/tiny.pt", map_location=device, weights_only=False)
     model_cfg = GPTConfig(**ckpt["model_cfg"])
+
+    # Prefer the vocab stored in the checkpoint; fall back to the corpus for old ckpts
+    if "tokenizer" in ckpt:
+        tok = CharTokenizer.from_chars(ckpt["tokenizer"]["chars"])
+    else:
+        with open("data/input.txt") as f:
+            tok = CharTokenizer(f.read())
+
     model = GPT(model_cfg).to(device)
     model.load_state_dict(ckpt["model"])
     model.eval()
