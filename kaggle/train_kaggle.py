@@ -48,12 +48,13 @@ def main():
     run([sys.executable, "scripts/train.py"], cwd=SRC, env=env)
     print(f"\ntraining + sample wall time: {time.perf_counter() - t0:.1f}s", flush=True)
 
-    ckpt = os.path.join(SRC, "checkpoints", "tiny.pt")
-    if not os.path.exists(ckpt):
-        raise FileNotFoundError(ckpt)
-    dst = os.path.join(OUT, "tiny.pt")
-    shutil.copy2(ckpt, dst)
-    print(f"saved {dst} ({os.path.getsize(dst)} bytes)", flush=True)
+    ckpt_dir = os.path.join(SRC, "checkpoints")
+    ckpts = sorted(f for f in os.listdir(ckpt_dir) if f.endswith(".pt"))
+    if not ckpts:
+        raise FileNotFoundError(ckpt_dir)
+    for name in ckpts:
+        shutil.copy2(os.path.join(ckpt_dir, name), os.path.join(OUT, name))
+        print(f"saved {name} ({os.path.getsize(os.path.join(OUT, name))} bytes)", flush=True)
     print(f"working dir: {sorted(os.listdir(OUT))}", flush=True)
 
 
