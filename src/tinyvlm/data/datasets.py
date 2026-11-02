@@ -24,9 +24,11 @@ class TokenDataset:
         return x, y
 
     def get_batch(self, batch_size: int, device: str = None):
-        ix = torch.randint(len(self.tokens) - self.block_size, (batch_size,), device=self.tokens.device)
-        x = torch.stack([self.tokens[i : i + self.block_size] for i in ix])
-        y = torch.stack([self.tokens[i + 1 : i + self.block_size + 1] for i in ix])
+        n = len(self.tokens) - self.block_size
+        ix = torch.randint(n, (batch_size,), device=self.tokens.device)
+        idx = ix[:, None] + torch.arange(self.block_size, device=self.tokens.device)
+        x = self.tokens[idx]
+        y = self.tokens[idx + 1]
         if device is not None and str(device) != str(self.tokens.device):
             return x.to(device), y.to(device)
         return x, y

@@ -27,7 +27,7 @@ def main():
 
     model.eval()
     context = torch.zeros((1, 1), dtype=torch.long, device=train_cfg.device)
-    out = model.generate(context, max_new_tokens=10000)
+    out = model.generate(context, max_new_tokens=300)
     print(tok.decode(out[0].tolist()))
 
 
