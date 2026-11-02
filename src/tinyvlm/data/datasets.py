@@ -9,8 +9,8 @@ def train_val_split(dataset: torch.Tensor, val_frac: float):
     return train_set, val_set
 
 class TokenDataset:
-    def __init__(self, tokens: torch.Tensor, block_size: int):
-        self.tokens = tokens
+    def __init__(self, tokens: torch.Tensor, block_size: int, ):
+        self.tokens = tokens.to(device)
         self.block_size = block_size
 
     def __len__(self):
@@ -21,10 +21,11 @@ class TokenDataset:
         y = self.tokens[i + 1: i + self.block_size + 1]
         return x, y
 
-    def get_batch(self, batch_size: int, device: str = "cpu"):
-        ix = torch.randint(len(self.tokens) - self.block_size - 1, (batch_size,)) 
-        xs, ys = zip(*(self.get_example(int(i)) for i in ix))
-        return torch.stack(xs).to(device), torch.stack(ys).to(device)
+    def get_batch(self, batch_size: int):
+        ix = torch.randint(len(self.tokens) - self.block_size, (batch_size,), device=self.tokens.device)
+        x = torch.stack([self.tokens[i: i + self.block_size] for i in ix])
+        y = torch.stack([self.tokens[i + 1: i + self.block_size + 1] for i in ix])
+        return x, y
 
 def make_datasets(text: str, tokenizer, block_size: int, val_frac: float = 0.1):
     """

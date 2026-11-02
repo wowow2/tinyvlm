@@ -45,12 +45,12 @@ class Trainer:
         self.model.eval()
         out = {}
         for name, ds in [("train", self.train_ds), ("val", self.val_ds)]:
-            losses = torch.zeros(self.cfg.eval_iters)
-            for k in range(self.cfg.eval_iters):
-                x, y = ds.get_batch(self.cfg.batch_size, self.cfg.device)
+            total_loss = torch.tensor(0.0, device=self.cfg.device)
+            for _ in range(self.cfg.eval_iters):
+                x, y = ds.get_batch(self.cfg.batch_size)
                 _, loss = self.model(x, y)
-                losses[k] = loss.item()
-            out[name] = losses.mean().item()
+                total_loss += loss
+            out[name] = (total_loss / self.cfg.eval_iters).item()
         self.model.train()
         return out
 

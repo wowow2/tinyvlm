@@ -9,7 +9,7 @@ train:
   batch_size: 32
   lr: 1.0e-3
   max_steps: 3000
-  eval_interval: 500
+  eval_interval: 100
   eval_iters: 100
   seed: 1337
   save_interval: 500
